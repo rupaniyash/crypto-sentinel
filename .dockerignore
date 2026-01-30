@@ -1,0 +1,17 @@
+# Ignore huge data folders
+spark_data/
+logs/
+plugins/
+dags/__pycache__/
+
+# Ignore Virtual Environment (Critical!)
+venv/
+.env
+
+# Ignore Git history
+.git/
+.gitignore
+
+# Ignore Python cache
+__pycache__/
+*.pyc

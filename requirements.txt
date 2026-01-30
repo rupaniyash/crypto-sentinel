@@ -1,0 +1,11 @@
+apache-airflow==2.7.1
+pandas
+psycopg2-binary
+virtualenv
+kafka-python>=2.0.2
+websocket-client>=1.6.0
+pyspark==3.5.0
+streamlit
+duckdb
+plotly
+watchdog
