@@ -18,4 +18,6 @@ __pycache__/
 
 # Ignore IDE settings
 .vscode/
-.idea/
+.idea/spark_data/
+__pycache__/
+.env
