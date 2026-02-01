@@ -60,6 +60,7 @@ services:
       - "7077:7077"
     volumes:
       - ./spark_data:/opt/spark_data
+      - ./:/opt/spark/work-dir
 
   spark-worker:
     image: apache/spark:3.5.0
@@ -69,6 +70,7 @@ services:
       - spark-master
     volumes:
       - ./spark_data:/opt/spark_data
+      - ./:/opt/spark/work-dir
 
   # --- INFRASTRUCTURE: AIRFLOW ---
   postgres:
@@ -132,6 +134,11 @@ services:
     depends_on:
       - kafka
     restart: always
+    logging:                        
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # 2. The Dashboard (Streamlit)
   # Visualizes the data from the Data Lake

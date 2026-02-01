@@ -76,6 +76,35 @@ docker exec -d crypto-spark-master /opt/spark/bin/spark-submit \
 **4. Access the Dashboard**
 Open your browser and navigate to: http://localhost:8501
 
+## ⚠️ Production Deployment Requirements
+
+This project is optimized for streaming data. If running on a **4GB RAM Server** (e.g., DigitalOcean Droplet, AWS t2.medium), you **must** enable Swap Memory to prevent crashes.
+
+**1. Enable Swap (Run once on server):**
+```bash
+fallocate -l 4G /swapfile && \
+chmod 600 /swapfile && \
+mkswap /swapfile && \
+swapon /swapfile && \
+echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
+```
+
+**2. Start the Pipeline**
+Use the automated script to handle permissions, cleanup, and startup:
+```bash
+chmod +x start_pipeline.sh
+./start_pipeline.sh
+```
+
+**3. Automated Maintenance (Prevent Disk Overflow)**
+To keep disk usage low, add a cron job to delete data older than 7 days:
+```bash
+# Open crontab
+crontab -e
+
+# Add this line to the bottom
+0 0 * * * find /path/to/repo/spark_data/storage -type f -mtime +7 -delete
+```
 
 ## 📂 Project Structure
 
