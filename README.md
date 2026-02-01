@@ -1,5 +1,7 @@
 # 🦅 Crypto Sentinel: Real-Time Data Lakehouse
 
+[![Live Demo](https://img.shields.io/badge/🔴_Live_Demo-Click_Here-success?style=for-the-badge)](http://165.232.153.250:8501/)
+
 ![Python](https://img.shields.io/badge/Python-3.9-blue)
 ![Spark](https://img.shields.io/badge/Apache_Spark-Streaming-orange)
 ![Kafka](https://img.shields.io/badge/Kafka-Redpanda-red)
