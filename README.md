@@ -1,28 +1,30 @@
-# 🦅 Crypto Sentinel: Real-Time Data Lakehouse
+# 🦅 Crypto Sentinel: Real-Time Data Lakehouse (Backend)
 
-[![Live Demo](https://img.shields.io/badge/🔴_Live_Demo-Click_Here-success?style=for-the-badge)](http://165.232.153.250:8501/)
+[![Live Demo](https://img.shields.io/badge/🔴_Live_Frontend-Click_Here-success?style=for-the-badge)](https://your-vercel-link.app)
 
 ![Python](https://img.shields.io/badge/Python-3.9-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-High_Performance-009688)
 ![Spark](https://img.shields.io/badge/Apache_Spark-Streaming-orange)
 ![Kafka](https://img.shields.io/badge/Kafka-Redpanda-red)
-![Streamlit](https://img.shields.io/badge/Streamlit-Live_Dashboard-ff4b4b)
-![DuckDB](https://img.shields.io/badge/DuckDB-OLAP-yellow)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)
 
-**Crypto Sentinel** is an end-to-end streaming data engineering pipeline that ingests, processes, and visualizes cryptocurrency market data in real-time. It processes raw WebSocket frames, streams them through Kafka and Spark, commits them to a Parquet Data Lake, and serves live analytics via a DuckDB + Streamlit dashboard.
+**Crypto Sentinel** is a high-throughput distributed data engineering pipeline. It ingests cryptocurrency market data via WebSockets, processes it with Apache Spark Structured Streaming, and exposes a low-latency JSON API for frontend consumption.
+
+**This is the Backend Engine.** For the User Interface, see the [Frontend Repository](https://github.com/YOUR_USERNAME/crypto-frontend).
 
 ---
 
 ## 🏗️ Architecture
 
-The pipeline follows a modern **Lakehouse Architecture**:
+The pipeline follows a **Decoupled Microservices Architecture**:
 
 ```mermaid
 graph LR
     A[Coinbase WebSocket] -->|JSON Stream| B(Kafka / Redpanda)
     B -->|Structured Streaming| C{Apache Spark}
     C -->|Micro-batches| D[(Parquet Data Lake)]
-    D -->|SQL Queries| E[DuckDB]
-    E -->|Analytics| F[Streamlit Dashboard]
+    D -->|Read| E[FastAPI Server]
+    E -->|JSON API| F[Vercel Frontend]
 ```
 ## 🔧 Tech Stack
 
@@ -32,23 +34,24 @@ graph LR
 | **Message Broker** | **Redpanda** | Kafka-compatible, low-latency log storage |
 | **Processing** | **Apache Spark** | Structured Streaming for micro-batching |
 | **Storage** | **Parquet** | Columnar storage (Local Data Lake) |
-| **Serving Layer** | **DuckDB** | In-process SQL OLAP for high-speed reads |
-| **Visualization** | **Streamlit** | Real-time interactive UI with Plotly |
+| **Serving Layer** | **FastAPI** | In-process SQL OLAP for high-speed reads |
+| **Server** | **Uvicorn** | Real-time interactive UI with Plotly |
 | **Infrastructure** | **Docker** | Container orchestration |
 
 ## 🌟 Key Features
 
-* **⚡ Sub-Second Latency:** Data travels from ingestion to dashboard in **<1 second**.
-* **⏸️ Freeze Mode:** "Matrix-style" pause feature allows users to halt the live feed to inspect historical spikes without losing the data connection.
-* **🚨 Price Alerts:** Real-time visual monitoring system that triggers a "Red Alert" UI flash when assets hit target thresholds.
-* **🛡️ Robust Error Handling:** Auto-recovery logic for network drops and Spark micro-batch processing delays.
-* **📜 Smooth Scrolling:** Implements Streamlit Fragments (`@st.fragment`) to allow independent component refreshing without page reloads.
+* **⚡ Headless Architecture:** Decoupled backend allows for independent scaling of data processing and UI rendering.
+* **🦅 Low-Latency API:** FastAPI endpoint serves the latest market state in <50ms.
+* **🛡️ Fault Tolerance:** Auto-recovery logic for Kafka connection drops and Spark streaming failures.
+* **💾 Efficient Storage:** Uses Parquet columnar format for 90% compression vs CSV.
+* **🐳 Fully Containerized:** One-command deployment via Docker Compose.
 
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 * Docker & Docker Compose installed on your machine.
+* 4GB+ RAM (if running Spark).
 
 ### Installation
 
@@ -59,7 +62,7 @@ cd crypto-sentinel
 ```
 
 **2. Start the Pipeline**
-This spins up the entire cluster (Spark Master, Worker, Kafka, Zookeeper, Dashboard).
+This spins up the entire cluster (Spark Master, Worker, Kafka, Zookeeper, API).
 ```bash
 docker compose up -d --build
 ```
@@ -73,12 +76,15 @@ docker exec -d crypto-spark-master /opt/spark/bin/spark-submit \
   /opt/spark/work-dir/spark_processor.py
 ```
 
-**4. Access the Dashboard**
-Open your browser and navigate to: http://localhost:8501
+**4. Test the API**
+Check if the backend is serving data:
+```bash
+curl http://localhost:8000/latest
+```
 
 ## ⚠️ Production Deployment Requirements
 
-This project is optimized for streaming data. If running on a **4GB RAM Server** (e.g., DigitalOcean Droplet, AWS t2.medium), you **must** enable Swap Memory to prevent crashes.
+This project is optimized for streaming data. If running on a **4GB RAM Server** (e.g., DigitalOcean Droplet, AWS t2.medium), you **must** enable Swap Memory to prevent Spark from crashing the OS.
 
 **1. Enable Swap (Run once on server):**
 ```bash
@@ -89,20 +95,9 @@ swapon /swapfile && \
 echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
 ```
 
-**2. Start the Pipeline**
-Use the automated script to handle permissions, cleanup, and startup:
+**2. Automated Maintenance**
+To prevent the Data Lake from filling the disk, add a cron job to delete data older than 7 days:
 ```bash
-chmod +x start_pipeline.sh
-./start_pipeline.sh
-```
-
-**3. Automated Maintenance (Prevent Disk Overflow)**
-To keep disk usage low, add a cron job to delete data older than 7 days:
-```bash
-# Open crontab
-crontab -e
-
-# Add this line to the bottom
 0 0 * * * find /path/to/repo/spark_data/storage -type f -mtime +7 -delete
 ```
 
@@ -110,32 +105,23 @@ crontab -e
 
 ```bash
 crypto-sentinel/
-├── dashboard.py         # Streamlit UI with DuckDB integration
+├── api.py               # FastAPI Serving Layer (Replaces Dashboard)
 ├── spark_processor.py   # Spark Structured Streaming logic
-├── producer.py          # WebSocket ingestion to Kafka
+├── connector.py         # WebSocket ingestion to Kafka
 ├── docker-compose.yml   # Container orchestration
 ├── requirements.txt     # Python dependencies
-├── .dockerignore        # Build optimization
 └── spark_data/          # Local Data Lake (Parquet files)
 ```
 
 ## 🧠 Engineering Challenges Solved
 
-### 1. The "Small File" Problem
-* **Problem:** Spark Streaming often creates tiny files that choke downstream readers.
-* **Solution:** Implemented file size filtering and robust read logic in DuckDB to ignore incomplete "ghost" files.
+### 1. Moving from Streamlit to FastAPI
+* **Problem:** Streamlit consumes excessive RAM (1GB+) for simple rendering, causing crashes on small servers.
+* **Solution:** Migrated to a **Headless API** architecture. The heavy visualization work is offloaded to the client's browser (React/Vercel), while the server only handles raw JSON data.
 
-### 2. UI Jitter & Scroll Reset
-* **Problem:** High-frequency updates typically make web UIs unusable.
-* **Solution:** Utilized **Streamlit Fragments** to isolate the chart re-render loop, enabling smooth scrolling while data updates at 1Hz.
-
-### 3. Docker Build Latency
-* **Problem:** The data lake grows to GBs in size, slowing down context transfer.
-* **Solution:** Optimized Docker context with `.dockerignore` to prevent build context explosion.
-
-## 📸 Screenshots
-
-*![alt text](image.png)*
+### 2. The "Small File" Problem
+* **Problem:** Spark Streaming creates tiny files that choke downstream readers.
+* **Solution:** Implemented file sorting logic in the API layer to only read the single most recent Parquet partition, ensuring O(1) read time regardless of lake size.
 
 ---
 

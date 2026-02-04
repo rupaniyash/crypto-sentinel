@@ -140,14 +140,14 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 2. The Dashboard (Streamlit)
-  # Visualizes the data from the Data Lake
-  dashboard:
+  # 2. The Dashboard 
+  api:
     build: .
-    container_name: crypto-dashboard
-    command: streamlit run dashboard.py --server.port 8501 --server.address 0.0.0.0
+    container_name: crypto-api
+    command: uvicorn api:app --host 0.0.0.0 --port 8000
     ports:
-      - "8501:8501"
+      - "8000:8000"
     volumes:
       - ./spark_data:/app/spark_data
+      - ./:/app
     restart: always
