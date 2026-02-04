@@ -1,6 +1,6 @@
 # 🦅 Crypto Sentinel: Real-Time Data Lakehouse (Backend)
 
-[![Live Demo](https://img.shields.io/badge/🔴_Live_Frontend-Click_Here-success?style=for-the-badge)](https://your-vercel-link.app)
+[![Live Demo](https://img.shields.io/badge/🔴_Live_Frontend-Click_Here-success?style=for-the-badge)](https://crypto-frontend-puce-theta.vercel.app/)
 
 ![Python](https://img.shields.io/badge/Python-3.9-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-High_Performance-009688)
