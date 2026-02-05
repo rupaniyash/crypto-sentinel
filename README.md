@@ -10,7 +10,7 @@
 
 **Crypto Sentinel** is a high-throughput distributed data engineering pipeline. It ingests cryptocurrency market data via WebSockets, processes it with Apache Spark Structured Streaming, and exposes a low-latency JSON API for frontend consumption.
 
-**This is the Backend Engine.** For the User Interface, see the [Frontend Repository](https://github.com/YOUR_USERNAME/crypto-frontend).
+**This is the Backend Engine.** For the User Interface, see the [Frontend Repository](https://github.com/rupaniyash/crypto-frontend).
 
 ---
 
